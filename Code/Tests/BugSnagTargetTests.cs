@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +56,8 @@ namespace Tests
             }
 
             // Assert.
+            Debug.WriteLine(error.ToString());
+            Console.WriteLine(error.ToString());
             error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
             error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
             error["events"][0]["metaData"].Count().ShouldBe(1);
