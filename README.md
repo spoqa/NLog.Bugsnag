@@ -1,5 +1,7 @@
 ![](http://nlog-project.org/images/NLog-logo-only_small.png) + ![](http://i.imgur.com/VA7NnER.png)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/j2bxeg51xu1udgty?svg=true)](https://ci.appveyor.com/project/PureKrome/nlog-bugsnag)
+
 ## Nlog.Bugsnag
 
 An NLog target for the [BugSnag error reporting SaaS](http://www.bugsnag.com/).
@@ -8,7 +10,7 @@ An NLog target for the [BugSnag error reporting SaaS](http://www.bugsnag.com/).
 
 ## Installation
 
-[![](http://i.imgur.com/oLtAwq9.png)](https://www.nuget.org/packages/WorldDomination.HttpClient.Helpers/)
+TODO: Image of NuGet cli goes here.
 
 Package Name: `NLog.Bugsnag`  
 CLI: `install-package NLog.BugSnag`  
