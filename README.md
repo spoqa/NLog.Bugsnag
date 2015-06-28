@@ -21,6 +21,7 @@ CLI: `install-package NLog.BugSnag`
 ## Detailed information about this target
 - Full target schema details (TODO: wiki page)
 - Sample nlog.config file using this target (TODO: wiki page)
+
 ---
 [![I'm happy to accept tips](http://img.shields.io/gittip/purekrome.svg?style=flat-square)](https://gratipay.com/PureKrome/)  
 ![Lic: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
