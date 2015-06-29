@@ -48,7 +48,7 @@ namespace Tests
         [InlineData(TheoryLoggerEventType.Info)]
         [InlineData(TheoryLoggerEventType.Debug)]
         [InlineData(TheoryLoggerEventType.Trace)]
-        public void GivenAnException_Error_LogsTheException(TheoryLoggerEventType eventType)
+        public void GivenAnException_LogEvent__LogsTheException(TheoryLoggerEventType eventType)
         {
             // Arrange.
             SetupLogManager();
@@ -100,12 +100,35 @@ namespace Tests
             }
 
             // Assert.
-            var ss = error.ToString(Formatting.None);
             error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
             error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
             error["events"][0]["metaData"].Count().ShouldBe(2);
             error["events"][0]["metaData"]["Extra Information"]["a1"].ToString().ShouldBe("b1");
             error["events"][0]["metaData"]["Extra Information"].Count().ShouldBe(2);
+        }
+
+        [Fact]
+        public void GivenNoExceptionWithSomeMetaData_Warning_LogsTheException()
+        {
+            // Arrange.
+            SetupLogManager();
+            var logger = LogManager.GetLogger("test");
+            const string errorMessage = "Something sad happened.";
+            
+            JObject error;
+
+            // Act.
+            using (var testServer = new TestServer())
+            {
+                logger.Warn(errorMessage);
+                error = testServer.GetLastResponse();
+            }
+
+            // Assert.
+            error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
+            error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
+            error["events"][0]["metaData"].Count().ShouldBe(1);
+            error["events"][0]["metaData"]["Exception Details"]["runtimeEnding"].ToString().ShouldBe("False");
         }
 
         private static string MapTheoryLoggerEventTypeToSeverity(TheoryLoggerEventType eventType)
