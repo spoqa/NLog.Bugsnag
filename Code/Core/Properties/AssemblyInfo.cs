@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NLog.BugSnag target")]
-[assembly: AssemblyDescription("An NLog target for the BugSnag error reporting SaaS")]
+[assembly: AssemblyTitle("NLog.Bugsnag target")]
+[assembly: AssemblyDescription("An NLog target for the Bugsnag error reporting SaaS")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NLog.BugSnag")]
+[assembly: AssemblyProduct("NLog.Bugsnag")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

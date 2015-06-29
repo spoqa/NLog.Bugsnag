@@ -1,6 +1,6 @@
 ﻿using Bugsnag;
 
-namespace NLog.BugSnag
+namespace NLog.Bugsnag
 {
     public static class Extensions
     {

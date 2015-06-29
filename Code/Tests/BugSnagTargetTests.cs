@@ -4,14 +4,14 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using NLog.BugSnag;
+using NLog.Bugsnag;
 using NLog.Config;
 using Shouldly;
 using Xunit;
 
 namespace Tests
 {
-    public class BugSnagTargetTests
+    public class BugsnagTargetTests
     {
         public static void SetupLogManager()
         {
@@ -21,7 +21,7 @@ namespace Tests
         public static void SetupLogManager(LogLevel logLevel)
         {
             var loggingConfiguration = new LoggingConfiguration();
-            var target = new BugSnagTarget
+            var target = new BugsnagTarget
             {
                 ApiKey = "d5dacfd18de492962408fef739c6f36c",
                 ReleaseStage = "release",
@@ -33,8 +33,22 @@ namespace Tests
             LogManager.Configuration = loggingConfiguration;
         }
 
-        [Fact]
-        public void GivenAnException_Error_LogsTheException()
+        public enum TheoryLoggerEventType
+        {
+            Error,
+            Warning,
+            Info,
+            Debug,
+            Trace
+        }
+
+        [Theory]
+        [InlineData(TheoryLoggerEventType.Error)]
+        [InlineData(TheoryLoggerEventType.Warning)]
+        [InlineData(TheoryLoggerEventType.Info)]
+        [InlineData(TheoryLoggerEventType.Debug)]
+        [InlineData(TheoryLoggerEventType.Trace)]
+        public void GivenAnException_Error_LogsTheException(TheoryLoggerEventType eventType)
         {
             // Arrange.
             SetupLogManager();
@@ -47,16 +61,38 @@ namespace Tests
             // Act.
             using (var testServer = new TestServer())
             {
-                logger.Error(exception, "pew pew");
+                LogMessage(eventType, logger)(exception, "pew pew");
                 error = testServer.GetLastResponse();
             }
 
             // Assert.
-            Debug.WriteLine(error.ToString());
-            Console.WriteLine(error.ToString());
+            Debug.WriteLine("Debug: " + error.ToString());
+            Console.WriteLine("Debug: " + error.ToString());
+            Trace.WriteLine("Trace: " + error.ToString());
             error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
             error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
             error["events"][0]["metaData"].Count().ShouldBe(1);
+            error["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
+        }
+
+        private static string MapTheoryLoggerEventTypeToSeverity(TheoryLoggerEventType eventType)
+        {
+            string result;
+
+            switch (eventType)
+            {
+                case TheoryLoggerEventType.Error:
+                    result = "error";
+                    break;
+                    case TheoryLoggerEventType.Warning:
+                    result = "warning";
+                    break;
+                default :
+                    result = "info";
+                    break;
+            }
+
+            return result;
         }
 
         [Fact]
@@ -90,6 +126,34 @@ namespace Tests
             error["events"][0]["metaData"].Count().ShouldBe(2);
             error["events"][0]["metaData"]["Extra Information"]["a1"].ToString().ShouldBe("b1");
             error["events"][0]["metaData"]["Extra Information"].Count().ShouldBe(2);
+        }
+
+        private static Action<Exception, string> LogMessage(TheoryLoggerEventType eventType, ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            Action<Exception, string> result;
+
+            switch (eventType)
+            {
+                case TheoryLoggerEventType.Error: result = (x, y) => logger.Error(x, y);
+                    break;
+                case TheoryLoggerEventType.Warning: result = (x, y) => logger.Warn(x, y);
+                    break;
+                case TheoryLoggerEventType.Info: result = (x, y) => logger.Info(x, y);
+                    break;
+                case TheoryLoggerEventType.Debug: result = (x, y) => logger.Info(x, y);
+                    break;
+                case TheoryLoggerEventType.Trace: result = (x, y) => logger.Info(x, y);
+                    break;
+                default:
+                    throw new NotImplementedException("damn!");
+            }
+
+            return result;
         }
     }
 }

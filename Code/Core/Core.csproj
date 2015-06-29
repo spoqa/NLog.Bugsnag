@@ -7,8 +7,8 @@
     <ProjectGuid>{B774A6AF-3853-4763-A899-90B3C0209397}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NLog.BugSnag</RootNamespace>
-    <AssemblyName>NLog.BugSnag</AssemblyName>
+    <RootNamespace>NLog.Bugsnag</RootNamespace>
+    <AssemblyName>NLog.Bugsnag</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -47,7 +47,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BugSnagTarget.cs" />
+    <Compile Include="BugsnagTarget.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -61,7 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BugSnagTargetTests.cs" />
+    <Compile Include="BugsnagTargetTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestServer.cs" />
   </ItemGroup>

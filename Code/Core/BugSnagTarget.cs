@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Bugsnag;
 using Bugsnag.Clients;
 using NLog.Config;
 using NLog.Targets;
 
-namespace NLog.BugSnag
+namespace NLog.Bugsnag
 {
-    [Target("BugSnag")]
-    public class BugSnagTarget : Target
+    [Target("Bugsnag")]
+    public class BugsnagTarget : Target
     {
         private const string MetaDataTabName = "Extra Information";
 
         private readonly Lazy<BaseClient> _baseClient;
  
-        public BugSnagTarget()
+        public BugsnagTarget()
         {
             _baseClient = new Lazy<BaseClient>(() =>
             {
-                var bugsnag = new BaseClient(ApiKey);
-                bugsnag.Config.ReleaseStage = ReleaseStage;
+                var Bugsnag = new BaseClient(ApiKey);
+                Bugsnag.Config.ReleaseStage = ReleaseStage;
                 if (!string.IsNullOrWhiteSpace(Endpoint))
                 {
-                    bugsnag.Config.Endpoint = Endpoint;
+                    Bugsnag.Config.Endpoint = Endpoint;
                 }
-                return bugsnag;
+                return Bugsnag;
             });
         }
 
