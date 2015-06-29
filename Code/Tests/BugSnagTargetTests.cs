@@ -75,26 +75,6 @@ namespace Tests
             error["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
         }
 
-        private static string MapTheoryLoggerEventTypeToSeverity(TheoryLoggerEventType eventType)
-        {
-            string result;
-
-            switch (eventType)
-            {
-                case TheoryLoggerEventType.Error:
-                    result = "error";
-                    break;
-                    case TheoryLoggerEventType.Warning:
-                    result = "warning";
-                    break;
-                default :
-                    result = "info";
-                    break;
-            }
-
-            return result;
-        }
-
         [Fact]
         public void GivenAnExceptionWithSomeMetaData_Error_LogsTheException()
         {
@@ -126,6 +106,26 @@ namespace Tests
             error["events"][0]["metaData"].Count().ShouldBe(2);
             error["events"][0]["metaData"]["Extra Information"]["a1"].ToString().ShouldBe("b1");
             error["events"][0]["metaData"]["Extra Information"].Count().ShouldBe(2);
+        }
+
+        private static string MapTheoryLoggerEventTypeToSeverity(TheoryLoggerEventType eventType)
+        {
+            string result;
+
+            switch (eventType)
+            {
+                case TheoryLoggerEventType.Error:
+                    result = "error";
+                    break;
+                case TheoryLoggerEventType.Warning:
+                    result = "warning";
+                    break;
+                default:
+                    result = "info";
+                    break;
+            }
+
+            return result;
         }
 
         private static Action<Exception, string> LogMessage(TheoryLoggerEventType eventType, ILogger logger)
