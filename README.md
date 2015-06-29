@@ -22,8 +22,8 @@ CLI: `install-package NLog.Bugsnag`
 - :moneybag: :moneybag: :moneybag: 
 
 ## Detailed information about this target
-- Full target schema details (TODO: wiki page)
-- Sample nlog.config file using this target (TODO: wiki page)
+- [Full target schema](https://github.com/PureKrome/NLog.Bugsnag/wiki/Target-Schema) details.
+- [Sample nlog.config file](https://github.com/PureKrome/NLog.Bugsnag/wiki/Sample-NLog.config-file) using this target.
 
 ---
 [![I'm happy to accept tips](http://img.shields.io/gittip/purekrome.svg?style=flat-square)](https://gratipay.com/PureKrome/)  
