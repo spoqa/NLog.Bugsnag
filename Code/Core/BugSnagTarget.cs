@@ -145,13 +145,13 @@ namespace NLog.Bugsnag
             switch (logEvent.Level.ToSeverity())
             {
                 case Severity.Error:
-                    exception = new Exception(logEvent.Message);
+                    exception = new ErrorException(logEvent.Message);
                     break;
                 case Severity.Warning:
                     exception = new WarningException(logEvent.Message);
                     break;
                 case Severity.Info:
-                    exception = new Exception(logEvent.Message);
+                    exception = new InfoException(logEvent.Message);
                     break;
                 default:
                     throw new Exception("Unhandled severity in ToSpecificException.");
