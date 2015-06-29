@@ -52,9 +52,9 @@ namespace NLog.Bugsnag
             {
                 _baseClient.Value.Notify(logEvent.Exception, logEvent.Level.ToSeverity(), metaData);
             }
-            else if (string.IsNullOrWhiteSpace(logEvent.Message))
+            else if (!string.IsNullOrWhiteSpace(logEvent.Message))
             {
-                var exception = new Exception(logEvent.Message);
+                var exception = ToSpecificException(logEvent);
                 _baseClient.Value.Notify(exception, logEvent.Level.ToSeverity(), metaData);
             }
         }
@@ -132,6 +132,32 @@ namespace NLog.Bugsnag
             }
 
             return metaData;
+        }
+
+        private static Exception ToSpecificException(LogEventInfo logEvent)
+        {
+            if (logEvent == null)
+            {
+                throw new ArgumentNullException("logEvent");
+            }
+
+            Exception exception;
+            switch (logEvent.Level.ToSeverity())
+            {
+                case Severity.Error:
+                    exception = new Exception(logEvent.Message);
+                    break;
+                case Severity.Warning:
+                    exception = new WarningException(logEvent.Message);
+                    break;
+                case Severity.Info:
+                    exception = new Exception(logEvent.Message);
+                    break;
+                default:
+                    throw new Exception("Unhandled severity in ToSpecificException.");
+            }
+
+            return exception;
         }
     }
 }
