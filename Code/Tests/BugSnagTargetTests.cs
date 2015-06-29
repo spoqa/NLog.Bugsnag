@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.BugSnag;
 using NLog.Config;
-using NLog.Layouts;
 using Shouldly;
 using Xunit;
 
