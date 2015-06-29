@@ -1,0 +1,8 @@
+before_build:
+  - nuget restore
+cache:
+  - packages -> **\packages.config
+deploy:
+  provider: NuGet
+  api_key:
+    secure: jfcUvHZhgnUboplqTBDWr8mG5PIlrgBv5TA2fhhop4ZSiDxskyy+RtYyeHoduJFR
