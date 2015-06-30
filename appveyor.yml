@@ -1,4 +1,4 @@
-version: 0.{build}
+version: '{build}.0.0'
 
 before_build:
   - nuget restore
