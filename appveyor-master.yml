@@ -10,6 +10,13 @@ assembly_info:
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
 
+branches:
+  only:
+  - master
+
+build:
+  verbosity: minimal
+
 cache:
   - packages -> **\packages.config
 
