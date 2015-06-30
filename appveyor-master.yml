@@ -12,7 +12,9 @@ assembly_info:
 
 branches:
   only:
-  - master
+    - master
+
+configuration: Release
 
 build:
   verbosity: minimal
