@@ -6,8 +6,8 @@
         <title>NLog - Bugsnag target</title>
         <authors>Justin Adler</authors>
         <owners>Justin Adler</owners>
-        <licenseUrl>https://raw.githubusercontent.com/PureKrome/HttpClient.Helpers/master/LICENSE</licenseUrl>
-        <projectUrl>https://github.com/PureKrome/HttpClient.Helpers</projectUrl>
+        <licenseUrl>https://raw.githubusercontent.com/PureKrome/NLog.Bugsnag/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/PureKrome/NLog.Bugsnag</projectUrl>
         <iconUrl>http://i.imgur.com/bR4Yf.jpg</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>An NLog target for the Bugsnag error reporting SaaS.
