@@ -14,7 +14,7 @@ namespace NLog.Bugsnag
         private const string MetaDataTabName = "Extra Information";
 
         private readonly Lazy<BaseClient> _baseClient;
- 
+
         public BugsnagTarget()
         {
             _baseClient = new Lazy<BaseClient>(() =>
@@ -50,11 +50,20 @@ namespace NLog.Bugsnag
 
             if (logEvent.Exception != null)
             {
+                // Do we have any metadata
+                var bugsnagInterface = logEvent.Exception as IMetadata;
+                if (bugsnagInterface != null)
+                {
+                    metaData = bugsnagInterface.Metadata;
+                }
+
+                // Notify Bugsnag of this exception.
                 _baseClient.Value.Notify(logEvent.Exception, logEvent.Level.ToSeverity(), metaData);
             }
             else if (!string.IsNullOrWhiteSpace(logEvent.Message))
             {
-                var exception = ToSpecificException(logEvent);
+                // We don't have an exception but we do have a message!
+                var exception = new BugsnagException(logEvent.Message);
                 _baseClient.Value.Notify(exception, logEvent.Level.ToSeverity(), metaData);
             }
         }
@@ -68,7 +77,7 @@ namespace NLog.Bugsnag
 
             // Lets see if we have some key/values.
             var doubleTuple = parameters as Tuple<string, string>[];
-            if (doubleTuple != null && 
+            if (doubleTuple != null &&
                 doubleTuple.Any())
             {
                 return ToMetadata(doubleTuple);
@@ -132,32 +141,6 @@ namespace NLog.Bugsnag
             }
 
             return metaData;
-        }
-
-        private static Exception ToSpecificException(LogEventInfo logEvent)
-        {
-            if (logEvent == null)
-            {
-                throw new ArgumentNullException("logEvent");
-            }
-
-            Exception exception;
-            switch (logEvent.Level.ToSeverity())
-            {
-                case Severity.Error:
-                    exception = new ErrorException(logEvent.Message);
-                    break;
-                case Severity.Warning:
-                    exception = new WarningException(logEvent.Message);
-                    break;
-                case Severity.Info:
-                    exception = new InfoException(logEvent.Message);
-                    break;
-                default:
-                    throw new Exception("Unhandled severity in ToSpecificException.");
-            }
-
-            return exception;
         }
     }
 }

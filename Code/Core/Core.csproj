@@ -47,12 +47,11 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BugsnagException.cs" />
     <Compile Include="BugsnagTarget.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="ErrorException.cs" />
+    <Compile Include="IMetadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="InfoException.cs" />
-    <Compile Include="WarningException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
