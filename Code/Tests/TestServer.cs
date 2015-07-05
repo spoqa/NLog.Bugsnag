@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
-using Newtonsoft.Json.Linq;
 
 namespace Tests
 {
@@ -10,7 +9,7 @@ namespace Tests
     public class TestServer : IDisposable
     {
         public static string EndpointUri = "http://localhost:8181/";
-        private readonly ConcurrentQueue<JObject> _messageQueue = new ConcurrentQueue<JObject>();
+        private readonly ConcurrentQueue<string> _messageQueue = new ConcurrentQueue<string>();
         private HttpListener _listener;
 
         public TestServer()
@@ -34,7 +33,7 @@ namespace Tests
                 try
                 {
                     var context = await _listener.GetContextAsync();
-                    _messageQueue.Enqueue(ProcessJsonRequest(context));
+                    _messageQueue.Enqueue(ProcessRequest(context));
                     context.Response.StatusCode = 200;
                     context.Response.Close();
                 }
@@ -53,7 +52,7 @@ namespace Tests
             }
         }
 
-        private static JObject ProcessJsonRequest(HttpListenerContext context)
+        private static string ProcessRequest(HttpListenerContext context)
         {
             string body;
             using (var reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
@@ -61,12 +60,12 @@ namespace Tests
                 body = reader.ReadToEnd();
             }
 
-            return JObject.Parse(body);
+            return body;
         }
 
-        public JObject GetLastResponse()
+        public string GetLastResponse()
         {
-            JObject result = null;
+            string result = null;
             _messageQueue.TryDequeue(out result);
             return result;
         }
