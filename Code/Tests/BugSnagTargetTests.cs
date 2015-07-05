@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using Bugsnag;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Bugsnag;
@@ -78,6 +77,7 @@ namespace Tests
             var anotherTabName = string.IsNullOrWhiteSpace(formattedMessageTab)
                 ? "Custom Data"
                 : formattedMessageTab;
+
             var result = JObject.Parse(error);
             result["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
             result["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
@@ -152,7 +152,7 @@ namespace Tests
             const string metaDataValue = "bbbbb";
             var metadata = new Metadata();
             metadata.AddToTab(tabName, metaDataKey, metaDataValue);
-            var exception = new BugsnagException(errorMessage) {Metadata = metadata};
+            var exception = new BugsnagException(errorMessage) { Metadata = metadata };
 
             const string formattedErrorMessage = "pew pew";
 

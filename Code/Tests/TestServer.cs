@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -9,12 +10,16 @@ namespace Tests
     public class TestServer : IDisposable
     {
         public static string EndpointUri = "http://localhost:8181/";
+        private readonly HttpListener _listener;
         private readonly ConcurrentQueue<string> _messageQueue = new ConcurrentQueue<string>();
-        private HttpListener _listener;
 
         public TestServer()
         {
-            Start();
+            _listener = new HttpListener();
+            _listener.Prefixes.Add(EndpointUri);
+            _listener.Start();
+
+            Task.Run(() => StartListeningAsync());
         }
 
         public void Dispose()
@@ -22,12 +27,8 @@ namespace Tests
             Stop();
         }
 
-        public async void Start()
+        public async Task StartListeningAsync()
         {
-            _listener = new HttpListener();
-            _listener.Prefixes.Add(EndpointUri);
-            _listener.Start();
-
             while (true)
             {
                 try
@@ -65,7 +66,7 @@ namespace Tests
 
         public string GetLastResponse()
         {
-            string result = null;
+            string result;
             _messageQueue.TryDequeue(out result);
             return result;
         }
