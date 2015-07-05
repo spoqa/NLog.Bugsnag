@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Bugsnag;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
@@ -13,19 +14,20 @@ namespace Tests
 {
     public class BugsnagTargetTests
     {
-        public static void SetupLogManager()
+        public static void SetupLogManager(string formattedMessageTab)
         {
-            SetupLogManager(LogLevel.Trace);
+            SetupLogManager(LogLevel.Trace, formattedMessageTab);
         }
 
-        public static void SetupLogManager(LogLevel logLevel)
+        public static void SetupLogManager(LogLevel logLevel, string formattedMessageTab = null)
         {
             var loggingConfiguration = new LoggingConfiguration();
             var target = new BugsnagTarget
             {
                 ApiKey = "d5dacfd18de492962408fef739c6f36c",
                 ReleaseStage = "release",
-                Endpoint = TestServer.EndpointUri
+                Endpoint = TestServer.EndpointUri,
+                FormattedMessageTab = formattedMessageTab
             };
 
             loggingConfiguration.LoggingRules.Add(new LoggingRule("*", logLevel, target));
@@ -43,92 +45,169 @@ namespace Tests
         }
 
         [Theory]
+        [InlineData(TheoryLoggerEventType.Error, null)]
+        [InlineData(TheoryLoggerEventType.Warning, null)]
+        [InlineData(TheoryLoggerEventType.Info, null)]
+        [InlineData(TheoryLoggerEventType.Debug, null)]
+        [InlineData(TheoryLoggerEventType.Trace, null)]
+        [InlineData(TheoryLoggerEventType.Error, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Warning, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Info, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Debug, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Trace, "Another Tab Name")]
+        public void GivenAnExceptionWithNoMetadata_LogMessage__LogsTheException(TheoryLoggerEventType eventType,
+            string formattedMessageTab)
+        {
+            // Arrange.
+            SetupLogManager(formattedMessageTab);
+            var logger = LogManager.GetLogger("test");
+            const string errorMessage = "Something sad happened.";
+            var exception = new Exception(errorMessage);
+
+            const string formattedErrorMessage = "pew pew";
+            string error;
+
+            // Act.
+            using (var testServer = new TestServer())
+            {
+                LogMessage(eventType, logger)(exception, formattedErrorMessage);
+                error = testServer.GetLastResponse();
+            }
+
+            // Assert.
+            var anotherTabName = string.IsNullOrWhiteSpace(formattedMessageTab)
+                ? "Custom Data"
+                : formattedMessageTab;
+            var result = JObject.Parse(error);
+            result["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
+            result["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
+            result["events"][0]["metaData"].Count().ShouldBe(2);
+            result["events"][0]["metaData"][anotherTabName][BugsnagTarget.FormattedMessageKey].ShouldBe(formattedErrorMessage);
+            result["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
+        }
+
+        [Theory]
+        [InlineData(TheoryLoggerEventType.Error, null)]
+        [InlineData(TheoryLoggerEventType.Warning, null)]
+        [InlineData(TheoryLoggerEventType.Info, null)]
+        [InlineData(TheoryLoggerEventType.Debug, null)]
+        [InlineData(TheoryLoggerEventType.Trace, null)]
+        [InlineData(TheoryLoggerEventType.Error, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Warning, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Info, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Debug, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Trace, "Another Tab Name")]
+        public void GivenABugsnagException_LogMessage__LogsTheException(TheoryLoggerEventType eventType,
+            string formattedMessageTab)
+        {
+            // Arrange.
+            SetupLogManager(formattedMessageTab);
+            var logger = LogManager.GetLogger("test");
+            const string errorMessage = "Something sad happened.";
+            var exception = new BugsnagException(errorMessage);
+
+            const string formattedErrorMessage = "pew pew";
+            string error;
+
+            // Act.
+            using (var testServer = new TestServer())
+            {
+                LogMessage(eventType, logger)(exception, formattedErrorMessage);
+                error = testServer.GetLastResponse();
+            }
+
+            // Assert.
+            var anotherTabName = string.IsNullOrWhiteSpace(formattedMessageTab)
+                ? "Custom Data"
+                : formattedMessageTab;
+            var result = JObject.Parse(error);
+            result["events"][0]["exceptions"][0]["errorClass"].ShouldBe("BugsnagException");
+            result["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
+            result["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
+            result["events"][0]["metaData"].Count().ShouldBe(2);
+            result["events"][0]["metaData"][anotherTabName][BugsnagTarget.FormattedMessageKey].ShouldBe(formattedErrorMessage);
+            result["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
+        }
+
+        [Theory]
+        [InlineData(TheoryLoggerEventType.Error, null)]
+        [InlineData(TheoryLoggerEventType.Warning, null)]
+        [InlineData(TheoryLoggerEventType.Info, null)]
+        [InlineData(TheoryLoggerEventType.Debug, null)]
+        [InlineData(TheoryLoggerEventType.Trace, null)]
+        [InlineData(TheoryLoggerEventType.Error, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Warning, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Info, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Debug, "Another Tab Name")]
+        [InlineData(TheoryLoggerEventType.Trace, "Another Tab Name")]
+        public void GivenABugsnagExceptionAndMetadata_LogMessage_LogsTheException(TheoryLoggerEventType eventType,
+            string formattedMessageTab)
+        {
+            // Arrange.
+            SetupLogManager(formattedMessageTab);
+            var logger = LogManager.GetLogger("test");
+            const string errorMessage = "Something sad happened.";
+            const string tabName = "Some Tab name";
+            const string metaDataKey = "aaaaa";
+            const string metaDataValue = "bbbbb";
+            var metadata = new Metadata();
+            metadata.AddToTab(tabName, metaDataKey, metaDataValue);
+            var exception = new BugsnagException(errorMessage) {Metadata = metadata};
+
+            const string formattedErrorMessage = "pew pew";
+
+            string error;
+
+            // Act.
+            using (var testServer = new TestServer())
+            {
+                LogMessage(eventType, logger)(exception, formattedErrorMessage);
+                error = testServer.GetLastResponse();
+            }
+
+            // Assert.
+            var anotherTabName = string.IsNullOrWhiteSpace(formattedMessageTab)
+                ? "Custom Data"
+                : formattedMessageTab;
+            var result = JObject.Parse(error);
+            result["events"][0]["exceptions"][0]["errorClass"].ShouldBe("BugsnagException");
+            result["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
+            result["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
+            result["events"][0]["metaData"].Count().ShouldBe(3);
+            result["events"][0]["metaData"][tabName][metaDataKey].ShouldBe(metaDataValue);
+            result["events"][0]["metaData"][anotherTabName][BugsnagTarget.FormattedMessageKey].ShouldBe(formattedErrorMessage);
+            result["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
+        }
+
+        [Theory]
         [InlineData(TheoryLoggerEventType.Error)]
         [InlineData(TheoryLoggerEventType.Warning)]
         [InlineData(TheoryLoggerEventType.Info)]
         [InlineData(TheoryLoggerEventType.Debug)]
         [InlineData(TheoryLoggerEventType.Trace)]
-        public void GivenAnException_LogEvent__LogsTheException(TheoryLoggerEventType eventType)
+        public void GivenAMessage_LogMessage_LogsTheErrorMessage(TheoryLoggerEventType eventType)
         {
             // Arrange.
-            SetupLogManager();
+            SetupLogManager(null);
             var logger = LogManager.GetLogger("test");
             const string errorMessage = "Something sad happened.";
-            var exception = new Exception(errorMessage);
 
-            JObject error;
+            string error;
 
             // Act.
             using (var testServer = new TestServer())
             {
-                LogMessage(eventType, logger)(exception, "pew pew");
+                LogMessageWithNoException(eventType, logger)(errorMessage);
                 error = testServer.GetLastResponse();
             }
 
             // Assert.
-            Debug.WriteLine("Debug: " + error.ToString());
-            Console.WriteLine("Debug: " + error.ToString());
-            Trace.WriteLine("Trace: " + error.ToString());
-            error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
-            error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
-            error["events"][0]["metaData"].Count().ShouldBe(1);
-            error["events"][0]["severity"].ToString().ShouldBe(MapTheoryLoggerEventTypeToSeverity(eventType));
-        }
-
-        [Fact]
-        public void GivenAnExceptionWithSomeMetaData_Error_LogsTheException()
-        {
-            // Arrange.
-            SetupLogManager();
-            var logger = LogManager.GetLogger("test");
-            const string errorMessage = "Something sad happened.";
-            var exception = new Exception(errorMessage);
-
-            var metaData = new[]
-            {
-                new Tuple<string, string>("a1", "b1"),
-                new Tuple<string, string>("a2", "b2")
-            };
-
-            JObject error;
-
-            // Act.
-            using (var testServer = new TestServer())
-            {
-                logger.Error(exception, "pew pew", metaData);
-                error = testServer.GetLastResponse();
-            }
-
-            // Assert.
-            error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
-            error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
-            error["events"][0]["metaData"].Count().ShouldBe(2);
-            error["events"][0]["metaData"]["Extra Information"]["a1"].ToString().ShouldBe("b1");
-            error["events"][0]["metaData"]["Extra Information"].Count().ShouldBe(2);
-        }
-
-        [Fact]
-        public void GivenNoExceptionWithSomeMetaData_Warning_LogsTheException()
-        {
-            // Arrange.
-            SetupLogManager();
-            var logger = LogManager.GetLogger("test");
-            const string errorMessage = "Something sad happened.";
-            
-            JObject error;
-
-            // Act.
-            using (var testServer = new TestServer())
-            {
-                logger.Warn(errorMessage);
-                error = testServer.GetLastResponse();
-            }
-
-            // Assert.
-            error["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
-            error["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
-            error["events"][0]["metaData"].Count().ShouldBe(1);
-            error["events"][0]["metaData"]["Exception Details"]["runtimeEnding"].ToString().ShouldBe("False");
+            var result = JObject.Parse(error);
+            result["events"][0]["exceptions"][0]["errorClass"].ToString().ShouldBe("BugsnagException");
+            result["events"][0]["exceptions"][0]["message"].ToString().ShouldBe(errorMessage);
+            result["events"][0]["exceptions"][0]["stacktrace"].HasValues.ShouldBe(true);
+            result["events"][0]["metaData"].Count().ShouldBe(1);
+            result["events"][0]["metaData"]["Exception Details"]["runtimeEnding"].ToString().ShouldBe("False");
         }
 
         private static string MapTheoryLoggerEventTypeToSeverity(TheoryLoggerEventType eventType)
@@ -171,6 +250,34 @@ namespace Tests
                 case TheoryLoggerEventType.Debug: result = (x, y) => logger.Info(x, y);
                     break;
                 case TheoryLoggerEventType.Trace: result = (x, y) => logger.Info(x, y);
+                    break;
+                default:
+                    throw new NotImplementedException("damn!");
+            }
+
+            return result;
+        }
+
+        private static Action<string> LogMessageWithNoException(TheoryLoggerEventType eventType, ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            Action<string> result;
+
+            switch (eventType)
+            {
+                case TheoryLoggerEventType.Error: result = logger.Error;
+                    break;
+                case TheoryLoggerEventType.Warning: result = logger.Warn;
+                    break;
+                case TheoryLoggerEventType.Info: result = logger.Info;
+                    break;
+                case TheoryLoggerEventType.Debug: result = logger.Info;
+                    break;
+                case TheoryLoggerEventType.Trace: result = logger.Info;
                     break;
                 default:
                     throw new NotImplementedException("damn!");

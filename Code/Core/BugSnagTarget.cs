@@ -11,8 +11,7 @@ namespace NLog.Bugsnag
     [Target("Bugsnag")]
     public class BugsnagTarget : Target
     {
-        private const string MetaDataTabName = "Extra Information";
-
+        public static string FormattedMessageKey = "Message";
         private readonly Lazy<BaseClient> _baseClient;
 
         public BugsnagTarget()
@@ -35,27 +34,24 @@ namespace NLog.Bugsnag
         [RequiredParameter]
         public string ReleaseStage { get; set; }
 
-        public string MetaDataTab { get; set; }
+        public string FormattedMessageTab { get; set; }
 
         public string Endpoint { get; set; }
 
         protected override void Write(LogEventInfo logEvent)
         {
-            Metadata metaData = null;
-
-            if (logEvent.Parameters != null)
-            {
-                metaData = ToMetadata(logEvent.Parameters);
-            }
-
             if (logEvent.Exception != null)
             {
+                Metadata metaData = null;
+
                 // Do we have any metadata
                 var bugsnagInterface = logEvent.Exception as IMetadata;
                 if (bugsnagInterface != null)
                 {
                     metaData = bugsnagInterface.Metadata;
                 }
+
+                AddFormattedMessageToMetadata(ref metaData, logEvent.FormattedMessage);
 
                 // Notify Bugsnag of this exception.
                 _baseClient.Value.Notify(logEvent.Exception, logEvent.Level.ToSeverity(), metaData);
@@ -64,83 +60,30 @@ namespace NLog.Bugsnag
             {
                 // We don't have an exception but we do have a message!
                 var exception = new BugsnagException(logEvent.Message);
-                _baseClient.Value.Notify(exception, logEvent.Level.ToSeverity(), metaData);
+                _baseClient.Value.Notify(exception, logEvent.Level.ToSeverity());
             }
         }
 
-        private Metadata ToMetadata(IEnumerable parameters)
+        private void AddFormattedMessageToMetadata(ref Metadata metadata, string formattedMessage)
         {
-            if (parameters == null)
+            if (string.IsNullOrWhiteSpace(formattedMessage))
             {
-                throw new ArgumentNullException("parameters");
+                return;
             }
 
-            // Lets see if we have some key/values.
-            var doubleTuple = parameters as Tuple<string, string>[];
-            if (doubleTuple != null &&
-                doubleTuple.Any())
+            if (metadata == null)
             {
-                return ToMetadata(doubleTuple);
+                metadata = new Metadata();
             }
 
-            var trippleTuple = parameters as Tuple<string, string, string>[];
-            if (trippleTuple != null &&
-                trippleTuple.Any())
+            if (!string.IsNullOrWhiteSpace(FormattedMessageTab))
             {
-                return ToMetadata(trippleTuple);
+                metadata.AddToTab(FormattedMessageTab, FormattedMessageKey, formattedMessage);
             }
-
-            return null;
-        }
-
-        private Metadata ToMetadata(Tuple<string, string>[] keyValues)
-        {
-            if (keyValues == null)
+            else
             {
-                throw new ArgumentNullException();
+                metadata.AddToTab(FormattedMessageKey, formattedMessage);
             }
-
-            Metadata metaData = null;
-
-            foreach (var keyValue in keyValues)
-            {
-                if (metaData == null)
-                {
-                    metaData = new Metadata();
-                }
-
-                metaData.AddToTab(string.IsNullOrWhiteSpace(MetaDataTab)
-                    ? MetaDataTabName
-                    : MetaDataTab,
-                    keyValue.Item1,
-                    keyValue.Item2);
-            }
-
-            return metaData;
-        }
-
-        private static Metadata ToMetadata(Tuple<string, string, string>[] keyValues)
-        {
-            if (keyValues == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            Metadata metaData = null;
-
-            foreach (var keyValue in keyValues)
-            {
-                if (metaData == null)
-                {
-                    metaData = new Metadata();
-                }
-
-                metaData.AddToTab(keyValue.Item1,
-                    keyValue.Item2,
-                    keyValue.Item3);
-            }
-
-            return metaData;
         }
     }
 }
