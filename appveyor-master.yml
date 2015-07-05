@@ -17,7 +17,9 @@ branches:
 configuration: Release
 
 build:
+  parallel: true
   verbosity: minimal
+  publish_nuget: true
 
 cache:
   - packages -> **\packages.config
