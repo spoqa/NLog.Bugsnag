@@ -3,6 +3,10 @@ version: '{build}'
 before_build:
   - nuget restore
 
+branches:
+  except:
+    - master
+
 assembly_info:
   patch: true
   file: AssemblyInfo.*
