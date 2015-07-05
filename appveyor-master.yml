@@ -1,4 +1,4 @@
-version: '0.{build}.0-prerelease'
+version: '1.0.0-alpha-{build}'
 
 before_build:
   - nuget restore
@@ -6,9 +6,9 @@ before_build:
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
 
 branches:
   only:
