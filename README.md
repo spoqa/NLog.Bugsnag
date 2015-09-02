@@ -1,7 +1,7 @@
 ![](http://nlog-project.org/images/NLog-logo-only_small.png) + ![](http://i.imgur.com/VA7NnER.png)
 
-Development: [![Build status](https://ci.appveyor.com/api/projects/status/j2bxeg51xu1udgty?svg=true)](https://ci.appveyor.com/project/PureKrome/nlog-bugsnag)  
-Master: [![Build status](https://ci.appveyor.com/api/projects/status/j2bxeg51xu1udgty/branch/master?svg=true)](https://ci.appveyor.com/project/PureKrome/nlog-bugsnag/branch/master)
+Development: [![Build status](https://ci.appveyor.com/api/projects/status/uja836rggaxu6cs4?svg=true)](https://ci.appveyor.com/project/PureKrome/nlog-bugsnag-7n0wx)  
+Master: [![Build status](https://ci.appveyor.com/api/projects/status/u44xhg1hgo9v05i3?svg=true)](https://ci.appveyor.com/project/PureKrome/nlog-bugsnag)
 
 ## Nlog.Bugsnag
 
