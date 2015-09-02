@@ -18,7 +18,7 @@ Bugsnag: http://www.bugsnag.com/</description>
         <language>en-AU</language>
         <tags>nlog bugsnag worlddomination worldomination unicorn magicalunicorn magical-unicorn</tags>
         <dependencies>
-            <dependency id="NLog" version="[4.0.0, 5.0.0)" />
+            <dependency id="NLog" version="[4.1.0, 5.0.0)" />
             <dependency id="Bugsnag" version="[1.2.0, 2.0.0)" />
         </dependencies>
     </metadata>
