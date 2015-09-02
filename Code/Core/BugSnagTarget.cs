@@ -18,13 +18,13 @@ namespace NLog.Bugsnag
         {
             _baseClient = new Lazy<BaseClient>(() =>
             {
-                var Bugsnag = new BaseClient(ApiKey);
-                Bugsnag.Config.ReleaseStage = ReleaseStage;
+                var bugsnag = new BaseClient(ApiKey);
+                bugsnag.Config.ReleaseStage = ReleaseStage;
                 if (!string.IsNullOrWhiteSpace(Endpoint))
                 {
-                    Bugsnag.Config.Endpoint = Endpoint;
+                    bugsnag.Config.Endpoint = Endpoint;
                 }
-                return Bugsnag;
+                return bugsnag;
             });
         }
 
