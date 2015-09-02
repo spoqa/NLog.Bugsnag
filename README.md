@@ -11,7 +11,7 @@ An NLog target for the [Bugsnag error reporting SaaS](http://www.bugsnag.com/).
 
 ## Installation
 
-TODO: Image of NuGet cli goes here.
+![install-package nlog.bugsnag](http://i.imgur.com/1BHeVPb.png)
 
 Package Name: `NLog.Bugsnag`  
 CLI: `install-package NLog.Bugsnag`  
