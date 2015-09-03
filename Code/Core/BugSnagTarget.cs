@@ -40,6 +40,8 @@ namespace NLog.Bugsnag
 
         protected override void Write(LogEventInfo logEvent)
         {
+            // A log event can be either an exception OR a message.
+            // If both were provided, then the exception takes precedence over the message.
             if (logEvent.Exception != null)
             {
                 Metadata metaData = null;
