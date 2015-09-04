@@ -13,6 +13,9 @@ environment:
   apiKey:
     secure: jfcUvHZhgnUboplqTBDWr8mG5PIlrgBv5TA2fhhop4ZSiDxskyy+RtYyeHoduJFR
 
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://gist.githubusercontent.com/PureKrome/0f79e25693d574807939/raw/8cf3160c9516ef1f4effc825c0a44acc918a0b5a/appveyor-build-info.ps'))
+
 before_build:
   - nuget restore
 
@@ -32,8 +35,8 @@ on_success:
   - ps: '& ".\NuGet\NuGet Package and Package.ps1" -Version $env:appveyor_build_version -NuGet "C:\Tools\NuGet\nuget.exe" -apiKey $env:apiKey'
 
 # NOTE: there are no artifacts, right now.
-artifacts:
-  - path: '**\*.nupkg'
+#artifacts:
+#  - path: '**\*.nupkg'
 
 cache:
   - packages -> **\packages.config
