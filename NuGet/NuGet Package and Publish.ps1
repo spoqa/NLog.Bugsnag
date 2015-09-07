@@ -29,12 +29,12 @@ function DisplayHelp()
     "    =>       clean: Removes all nupkg files from the destination before running this script. Default: 0 (no cleaning)."
     ""
     ""
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha"
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha -destination C:\temp\TempNuGetPackages"
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha -source ../nugetspecs/ -destination C:\temp\TempNuGetPackages"
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe"
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe -apiKey ABCD-EFG..."
-    "eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe -feedSource https://www.myget.org/F/pushit/api/v2 -apiKey ABCD-EFG..."
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha"
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha -destination C:\temp\TempNuGetPackages"
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha -source ../nugetspecs/ -destination C:\temp\TempNuGetPackages"
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe"
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe -apiKey ABCD-EFG..."
+    "eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha -nuget c:\temp\nuget.exe -feedSource https://www.myget.org/F/pushit/api/v2 -apiKey ABCD-EFG..."
     ""
 }
 
@@ -56,7 +56,7 @@ function DisplayCommandLineArgs()
     {
         ""
         "**** The version of this NuGet package is required."
-        "**** Eg. & '.\NuGet Package and Publish.ps1' -version 0.1-alpha"
+        "**** Eg. & '.\NuGet Package and Package.ps1' -version 0.1-alpha"
         ""
         ""
         throw;
@@ -213,7 +213,7 @@ $global:nugetExe = ""
 "  them to a NuGet server, if an api key was provided."
 ""
 "  *** NEED HELP? use the -help argument."
-"      eg.  & '.\NuGet Package and Publish.ps1' -help"
+"      eg.  & '.\NuGet Package and Package.ps1' -help"
 ""
 ""
 
