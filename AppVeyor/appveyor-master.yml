@@ -1,5 +1,5 @@
 
-version: '1.0.0-pre0{build}'
+version: '1.{build}.0'
 configuration: Release
 
 branches:
@@ -12,6 +12,9 @@ pull_requests:
 environment:
   apiKey:
     secure: jfcUvHZhgnUboplqTBDWr8mG5PIlrgBv5TA2fhhop4ZSiDxskyy+RtYyeHoduJFR
+
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://gist.githubusercontent.com/PureKrome/0f79e25693d574807939/raw/8cf3160c9516ef1f4effc825c0a44acc918a0b5a/appveyor-build-info.ps'))
 
 before_build:
   - nuget restore
@@ -28,14 +31,7 @@ build:
   verbosity: minimal
 
 on_success:
-  - ps: Write-Host $env:appveyor_build_version
-  - ps: '& ".\NuGet\NuGet Package and Package.ps1" -Version $env:appveyor_build_version -NuGet "C:\Tools\NuGet\nuget.exe" -apiKey $env:apiKey'
-
-# NOTE: there are no artifacts, right now.
-artifacts:
-  - path: '**\*.nupkg'
+  - ps: if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) { & ".\NuGet\NuGet Package and Publish.ps1" -Version $env:appveyor_build_version -apiKey $env:apiKey -NuGet "C:\Tools\NuGet\nuget.exe" }
 
 cache:
   - packages -> **\packages.config
-
-

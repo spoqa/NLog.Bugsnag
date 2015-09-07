@@ -18,13 +18,13 @@ namespace NLog.Bugsnag
         {
             _baseClient = new Lazy<BaseClient>(() =>
             {
-                var Bugsnag = new BaseClient(ApiKey);
-                Bugsnag.Config.ReleaseStage = ReleaseStage;
+                var bugsnag = new BaseClient(ApiKey);
+                bugsnag.Config.ReleaseStage = ReleaseStage;
                 if (!string.IsNullOrWhiteSpace(Endpoint))
                 {
-                    Bugsnag.Config.Endpoint = Endpoint;
+                    bugsnag.Config.Endpoint = Endpoint;
                 }
-                return Bugsnag;
+                return bugsnag;
             });
         }
 
@@ -40,6 +40,8 @@ namespace NLog.Bugsnag
 
         protected override void Write(LogEventInfo logEvent)
         {
+            // A log event can be either an exception OR a message.
+            // If both were provided, then the exception takes precedence over the message.
             if (logEvent.Exception != null)
             {
                 Metadata metaData = null;
