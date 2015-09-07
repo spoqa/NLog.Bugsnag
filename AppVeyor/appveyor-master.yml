@@ -1,5 +1,5 @@
 
-version: '1.0.0-pre0{build}'
+version: '1.{build}.0'
 configuration: Release
 
 branches:
@@ -31,12 +31,7 @@ build:
   verbosity: minimal
 
 on_success:
-  - ps: Write-Host $env:appveyor_build_version
-  - ps: '& ".\NuGet\NuGet Package and Package.ps1" -Version $env:appveyor_build_version -NuGet "C:\Tools\NuGet\nuget.exe" -apiKey $env:apiKey'
-
-# NOTE: there are no artifacts, right now.
-#artifacts:
-#  - path: '**\*.nupkg'
+  - ps: '& ".\NuGet\NuGet Package and Publish.ps1" -Version $env:appveyor_build_version -NuGet "C:\Tools\NuGet\nuget.exe" -apiKey $env:apiKey'
 
 cache:
   - packages -> **\packages.config
