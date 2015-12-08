@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
 using Bugsnag;
 using Bugsnag.Clients;
 using NLog.Config;
@@ -14,29 +12,30 @@ namespace NLog.Bugsnag
         public static string FormattedMessageKey = "Message";
         private readonly Lazy<BaseClient> _baseClient;
 
-        public BugsnagTarget()
-        {
-            _baseClient = new Lazy<BaseClient>(() =>
-            {
-                var bugsnag = new BaseClient(ApiKey);
-                bugsnag.Config.ReleaseStage = ReleaseStage;
-                if (!string.IsNullOrWhiteSpace(Endpoint))
-                {
-                    bugsnag.Config.Endpoint = Endpoint;
-                }
-                return bugsnag;
-            });
-        }
-
         [RequiredParameter]
         public string ApiKey { get; set; }
+
+        public BaseClient Client => _baseClient.Value;
+
+        public string Endpoint { get; set; }
+
+        public string FormattedMessageTab { get; set; }
 
         [RequiredParameter]
         public string ReleaseStage { get; set; }
 
-        public string FormattedMessageTab { get; set; }
-
-        public string Endpoint { get; set; }
+        public BugsnagTarget()
+        {
+            _baseClient = new Lazy<BaseClient>(
+                () =>
+                {
+                    var bugsnag = new BaseClient(ApiKey);
+                    bugsnag.Config.ReleaseStage = ReleaseStage;
+                    if (!string.IsNullOrWhiteSpace(Endpoint))
+                        bugsnag.Config.Endpoint = Endpoint;
+                    return bugsnag;
+                });
+        }
 
         protected override void Write(LogEventInfo logEvent)
         {
@@ -49,9 +48,7 @@ namespace NLog.Bugsnag
                 // Do we have any metadata
                 var bugsnagInterface = logEvent.Exception as IMetadata;
                 if (bugsnagInterface != null)
-                {
                     metaData = bugsnagInterface.Metadata;
-                }
 
                 AddFormattedMessageToMetadata(ref metaData, logEvent.FormattedMessage);
 
@@ -69,23 +66,15 @@ namespace NLog.Bugsnag
         private void AddFormattedMessageToMetadata(ref Metadata metadata, string formattedMessage)
         {
             if (string.IsNullOrWhiteSpace(formattedMessage))
-            {
                 return;
-            }
 
             if (metadata == null)
-            {
                 metadata = new Metadata();
-            }
 
             if (!string.IsNullOrWhiteSpace(FormattedMessageTab))
-            {
                 metadata.AddToTab(FormattedMessageTab, FormattedMessageKey, formattedMessage);
-            }
             else
-            {
                 metadata.AddToTab(FormattedMessageKey, formattedMessage);
-            }
         }
     }
 }
